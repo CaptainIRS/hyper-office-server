@@ -8,7 +8,16 @@ services:
       - 9042:9042
     volumes:
       - cassandra:/var/lib/cassandra
-  
+
+  redis:
+    image: redis:7.0.4
+    container_name: redis
+    ports:
+      - 6379:6379
+    command: '--requirepass password'
+    volumes:
+      - redis:/data
+
   express-server:
     build:
       context: .
@@ -21,3 +30,4 @@ services:
 
 volumes:
   cassandra:
+  redis:

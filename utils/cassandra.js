@@ -1,35 +1,41 @@
 const cassandra = require('cassandra-driver');
+var models = require('express-cassandra');
+var path = require('path');
+const contactPoints = [`${process.env.DB_HOST || 'localhost'}`];
 
-const contactPoints = [`${process.env.DB_HOST || 'localhost'}:9042`];
-const client = new cassandra.Client({
-    contactPoints: contactPoints,
-    localDataCenter: 'datacenter1',
-    credentials: { username: 'cassandra', password: 'cassandra' },
-    socketOptions: { readTimeout: 1000 }
-});
-
-function connect() {
-    return new Promise(function (resolve, reject) {
-        client.connect().then(function () {
-            resolve();
-        }).catch(function (err) {
-            reject(err);
-        });
-    });
-}
+modelsPath = path.normalize(path.join(__dirname, '..', 'models'));
 
 function establishConnection() {
-    connect().then(function () {
-        console.log('Cassandra connected');
-    }).catch(function (err) {
-        console.log('Cassandra connection error: %s', err.message);
-        console.log('Could not connect to Cassandra, retrying in 5 seconds');
-        setTimeout(function () {
-            establishConnection();
-        }, 5000);
-    });
+    models.setDirectory( modelsPath).bind({
+            clientOptions: {
+                contactPoints: contactPoints,
+                localDataCenter: 'datacenter1',
+                protocolOptions: { port: 9042 },
+                keyspace: 'hyperoffice',
+                authProvider: new models.driver.auth.PlainTextAuthProvider('cassandra', 'cassandra'),
+                queryOptions: { consistency: models.consistencies.one },
+                socketOptions: { readTimeout: 10000 }
+            },
+            ormOptions: {
+                defaultReplicationStrategy: {
+                    class: 'SimpleStrategy',
+                    replication_factor: 1
+                },
+                migration: 'safe'
+            }
+        },
+        function (err) {
+            if (err) {
+                console.log('Connection error', err);
+                console.log("Retrying in 5 seconds...");
+                setTimeout(establishConnection, 5000);
+            } else {
+                console.log('Connected to Cassandra');  
+            }
+        }
+    )
 }
 
 establishConnection();
 
-module.exports = client;
+module.exports = models;

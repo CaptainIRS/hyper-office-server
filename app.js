@@ -13,6 +13,8 @@ var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
 const passport = require('passport');
 
+var form = require('./routes/form');
+
 var app = express();
 
 app.use(cors({
@@ -38,6 +40,7 @@ app.use(passport.session());
 require('./utils/passport')(passport);
 
 app.use('/auth', authRouter)
+app.use('/form', form)
 app.use('/', indexRouter);
 
 module.exports = app;

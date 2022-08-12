@@ -51,10 +51,10 @@ router.get('/user', async function(req, res, next) {
     res.send(req.user);
 })
 
-router.post('/logout', function(req, res, next) {
+router.get('/logout', function(req, res, next) {
     req.logout( function(err) {
         if (err) return next(err);
-        return res.status(200).json({message: 'User logged out'});
+        res.status(200).json({message: 'User logged out'});
     })
 });
 

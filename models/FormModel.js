@@ -5,9 +5,12 @@ module.exports = {
         },
         data: {
             type: 'ascii',
-        }
+        },
+        id: {
+            type: 'uuid'
+        },
     },
-    key: ['name'],
+    key: ['id'],
     options: {
         timestamps: true,
     }

@@ -8,6 +8,10 @@ module.exports = {
         },
         name: {
             type: 'text',
+        },
+        role: {
+            type: 'text',
+            default: 'User',
         }
     },
     key: ['email'],

@@ -1,0 +1,82 @@
+{
+	"name": "hyper-office",
+	"version": "1.0.0",
+	"client": {
+		"tlsEnable": true,
+		"adminCredential": {
+			"id": "admin",
+			"password": "adminpw"
+		},
+		"enableAuthentication": true,
+		"organization": "Administration",
+		"connection": {
+			"timeout": {
+				"peer": {
+					"endorser": "300"
+				},
+				"orderer": "300"
+			}
+		}
+	},
+	"channels": {
+		"documentchannel": {
+			"peers": {
+				"peer0.administration.hyper-office.com": {},
+				"peer0.stakeholders.hyper-office.com": {}
+			},
+			"connection": {
+				"timeout": {
+					"peer": {
+						"endorser": "6000",
+						"eventHub": "6000",
+						"eventReg": "6000"
+					}
+				}
+			}
+		}
+	},
+	"organizations": {
+		"Administration": {
+			"mspid": "AdministrationMSP",
+			"adminPrivateKey": {
+				"path": "/tmp/crypto/peerOrganizations/administration.hyper-office.com/users/Admin@administration.hyper-office.com/msp/keystore/priv_sk"
+			},
+			"peers": ["peer0.administration.hyper-office.com"],
+			"signedCert": {
+				"path": "/tmp/crypto/peerOrganizations/administration.hyper-office.com/users/Admin@administration.hyper-office.com/msp/signcerts/cert.pem"
+			}
+		},
+		"Stakeholders": {
+			"mspid": "StakeholdersMSP",
+			"adminPrivateKey": {
+				"path": "/tmp/crypto/peerOrganizations/stakeholders.hyper-office.com/users/Admin@stakeholders.hyper-office.com/msp/keystore/priv_sk"
+			},
+			"peers": ["peer0.stakeholders.hyper-office.com"],
+			"signedCert": {
+				"path": "/tmp/crypto/peerOrganizations/stakeholders.hyper-office.com/users/Admin@stakeholders.hyper-office.com/msp/signcerts/cert.pem"
+			}
+		}
+	},
+	"peers": {
+		"peer0.administration.hyper-office.com": {
+			"tlsCACerts": {
+				"path": "/tmp/crypto/peerOrganizations/administration.hyper-office.com/peers/peer0.administration.hyper-office.com/tls/ca.crt"
+			},
+			"url": "grpcs://peer0.administration.hyper-office.com:7051"
+		},
+		"peer0.stakeholders.hyper-office.com": {
+			"tlsCACerts": {
+				"path": "/tmp/crypto/peerOrganizations/stakeholders.hyper-office.com/peers/peer0.stakeholders.hyper-office.com/tls/ca.crt"
+			},
+			"url": "grpcs://peer0.stakeholders.hyper-office.com:9051"
+		}
+	},
+	"orderers": {
+		"orderer.hyper-office.com": {
+		    "tlsCACerts": {
+				"path": "/tmp/crypto/ordererOrganizations/hyper-office.com/orderers/orderer.hyper-office.com/tls/ca.crt"
+			},
+		  "url": "grpcs://orderer.hyper-office.com:7050"
+		}
+	}
+}

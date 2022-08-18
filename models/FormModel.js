@@ -9,6 +9,7 @@ module.exports = {
         id: {
             type: 'uuid'
         },
+        workflow: 'uuid'
     },
     key: ['id'],
     options: {

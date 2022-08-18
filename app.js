@@ -12,6 +12,7 @@ var redisStore = require('connect-redis')(session);
 var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
 var rolesRouter = require('./routes/role');
+var workflowRouter = require('./routes/workflow');
 const passport = require('passport');
 
 var form = require('./routes/form');
@@ -43,6 +44,7 @@ require('./utils/passport')(passport);
 app.use('/auth', authRouter)
 app.use('/form', form)
 app.use('/roles', rolesRouter)
+app.use('/workflow', workflowRouter)
 app.use('/', indexRouter);
 
 module.exports = app;

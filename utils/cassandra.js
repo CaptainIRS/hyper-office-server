@@ -17,6 +17,12 @@ function establishConnection() {
                 socketOptions: { readTimeout: 10000 }
             },
             ormOptions: {
+                udts: {
+                    state: {
+                        status: 'text',
+                        designation: 'text',
+                    }
+                },
                 defaultReplicationStrategy: {
                     class: 'SimpleStrategy',
                     replication_factor: 1

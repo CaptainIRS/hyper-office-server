@@ -3,27 +3,30 @@ var router = express.Router();
 var models = require('../utils/cassandra');
 
 router.post('/create_form', async function(req, res) {
-    const {name, data} = req.body;
+    const {name, data, workflow} = req.body;
     try {
         const form = new models.instance.Form({
             name: name,
             data: data,
+            workflow: models.uuidFromString(workflow),
             id: models.uuid(),
         });
         await form.saveAsync();
         res.status(200).json({message: 'Form Created'});
     } catch (err) {
+        console.error(err);
         res.status(500).send({message: 'Error creating form'});
     }
 });
 
 
 router.post('/update_form', async function(req, res) {
-    const {name, data, id} = req.body;
+    const {name, data, id, workflow} = req.body;
     try {
         const form = await models.instance.Form.findOneAsync({id: models.uuidFromString(id)});
         form.name = name;
         form.data = data;
+        form.workflow = models.uuidFromString(workflow);
         await form.saveAsync();
         res.status(200).json({message: 'Form Updated'});
     } catch (err) {

@@ -33,7 +33,9 @@ module.exports = function(passport) {
     passport.deserializeUser(async function(email, done) {
         try {
             const user = await models.instance.User.findOneAsync({email: email});
-            done(null, {email: user.email, name: user.name, role: user.role});
+            if (user) {
+                done(null, {email: user.email, name: user.name, role: user.role});
+            }
         }
         catch (err) {
             console.log(err);

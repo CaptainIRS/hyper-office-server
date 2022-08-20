@@ -3,6 +3,7 @@ var router = express.Router();
 var models = require('../utils/cassandra');
 var bcrypt = require('bcrypt');
 const passport = require('passport');
+const getTabs = require('../utils/getTabs');
 
 router.post('/register', async function(req, res, next) {
     const {email, name, password} = req.body;
@@ -47,8 +48,13 @@ router.post('/login', async function(req, res, next) {
     })(req, res, next);
 });
 
-router.get('/user', async function(req, res, next) {
-    res.send(req.user);
+router.get('/user', async function(req, res) {
+    try {
+        const tabs = getTabs(req.user.role);
+        res.send({...req.user, tabs});
+    } catch (err) {
+        res.status(500).send({message: 'Error getting user'});
+    }
 })
 
 router.get('/logout', function(req, res, next) {

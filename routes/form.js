@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var models = require('../utils/cassandra');
 var fs = require('fs');
-
+var ipfs = require('../utils/ipfs');
 router.post('/create_form', async function(req, res) {
     const {name, data, workflow} = req.body;
     try {
@@ -78,25 +78,26 @@ router.get('/get_form', async function(req, res) {
     }
 });
 
-router.post('/save_response', async function(req, res) {
+router.post('/save_pdf', async function(req, res) {
     try {
         const {formId, response} = req.body;
-        const saved_response = new models.instance.FormResponse({
+        const file_buffer = Buffer.from(req.body.base64, 'base64');
+        const ipfsFile = await ipfs.add(file_buffer);
+        cid = ipfsFile.cid.toString();
+        const savedResponse = new models.instance.FormResponse({
             email: req.user.email,
             form: models.uuidFromString(formId),
-            data: response
+            data: response,
+            cid: cid,
         });
-        await saved_response.saveAsync();
-        res.status(200).json({message: 'Form Saved'});
-    } catch (err) {
+        await savedResponse.saveAsync();
+        // res.status(200).send({message: 'Successfully saved form and PDF', cid: cid});
+        res.redirect(process.env.FRONTEND + '/viewdocs/' + cid);
+    }
+    catch (err) {
+        console.log(err);
         res.status(500).send({message: 'Failed to save form response'});
     }
-});
-
-router.post('/save_pdf', async function(req, res) {
-    const file_buffer = Buffer.from(req.body.base64, 'base64');
-    const file = fs.writeFileSync(req.body.fileName, file_buffer, {encoding: 'base64'});
-    res.status(200).send({message: 'Saved PDF'});
 })
 
 module.exports = router;

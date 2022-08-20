@@ -1,0 +1,9 @@
+{
+	"network-configs": {
+		"hyper-office": {
+			"name": "hyper-office",
+			"profile": "/opt/explorer/app/platform/fabric/connection-profile/hyper-office.json"
+		}
+	},
+	"license": "Apache-2.0"
+}

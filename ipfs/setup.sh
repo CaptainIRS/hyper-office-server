@@ -19,7 +19,7 @@ ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "POST"]
 ipfs bootstrap rm --all
 ipfs bootstrap add /ip4/$(hostname -i)/tcp/4001/ipfs/$(ipfs config show | grep "PeerID" |  sed 's/^.*: "\(.*\)"$/\1/')
 ipfs daemon &
-if [[ -d /webui && -z "$SETUP_WEBUI" ]]; then
+if [[ -d /webui && "$SETUP_WEBUI" = true ]]; then
   echo "WebUI does not exist. Setting it up..."
   sleep 5
   ipfs add -r /webui/bafybeibozpulxtpv5nhfa2ue3dcjx23ndh3gwr5vwllk7ptoyfwnfjjr4q

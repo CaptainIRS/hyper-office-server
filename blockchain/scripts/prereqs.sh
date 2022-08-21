@@ -68,3 +68,5 @@ if [[ ! -d "bin" ]]; then
     curl -sSL -k https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/bootstrap.sh | bash -s -- 2.4.3 -s -d
   fi
 fi
+
+curl -sSL -k https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/bootstrap.sh | bash -s -- 2.4.3 -s -b

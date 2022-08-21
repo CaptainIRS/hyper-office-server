@@ -61,8 +61,6 @@ function checkPrereqs() {
   fi
 }
 
-checkPrereqs
-
 if [[ ! -d "bin" ]]; then
   if [[ ! -d "config" ]]; then
     curl -sSL -k https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/bootstrap.sh | bash -s -- 2.4.3 -s -d
@@ -70,3 +68,5 @@ if [[ ! -d "bin" ]]; then
 fi
 
 curl -sSL -k https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/bootstrap.sh | bash -s -- 2.4.3 -s -b
+
+checkPrereqs

@@ -13,6 +13,8 @@ var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
 var rolesRouter = require('./routes/role');
 var workflowRouter = require('./routes/workflow');
+var ipfsRouter = require('./routes/ipfs');
+
 const passport = require('passport');
 
 var form = require('./routes/form');
@@ -45,6 +47,7 @@ app.use('/auth', authRouter)
 app.use('/form', form)
 app.use('/roles', rolesRouter)
 app.use('/workflow', workflowRouter)
+app.use('/ipfs', ipfsRouter)
 app.use('/', indexRouter);
 
 module.exports = app;

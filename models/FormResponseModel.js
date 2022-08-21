@@ -9,16 +9,16 @@ module.exports = {
         data: {
             type: 'ascii'
         },
-        status: {
-            type: 'text',
-            default: 'requested'
-        },
         cid: {
             type: 'text',
             default: '',
-        }
+        },
+        stage: 'int',
+        isDone: 'boolean',
+        id: 'uuid',
+        nextDesignation: 'text',
     },
-    key: ['email', 'form'],
+    key: ['id'],
     options: {
         timestamps: true,
         versions: true,

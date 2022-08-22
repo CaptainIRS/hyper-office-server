@@ -4,9 +4,19 @@ var models = require('../utils/cassandra');
 var bcrypt = require('bcrypt');
 const passport = require('passport');
 const getTabs = require('../utils/getTabs');
+const blockchain = require('../utils/blockchain');
 
 router.post('/register', async function(req, res, next) {
-    const {email, name, password} = req.body;
+    const {email, name, password, role} = req.body;
+    if (role === 'User') {
+        await blockchain.enrollUser(email);
+    } else if (role === 'Moderator') {
+        await blockchain.enrollModerator(email);
+    } else if (role === 'Administrator') {
+        await blockchain.enrollAdmin(email);
+    } else {
+        return res.status(400).json({message: 'Invalid role'});
+    }
     try {
         const user = await models.instance.User.findOneAsync({email: email});
         if (user) {
@@ -19,7 +29,8 @@ router.post('/register', async function(req, res, next) {
             const newUser = new models.instance.User({
                 email: email,
                 name: name,
-                password: hash
+                password: hash,
+                role: role,
             });
             await newUser.saveAsync();
             res.status(201).json({message: 'User created'});
@@ -33,6 +44,7 @@ router.post('/register', async function(req, res, next) {
 
 router.post('/login', async function(req, res, next) {
     passport.authenticate('local', function(err, user, info) {
+        console.log(user.role);
         if (err) {
             return next(err);
         }

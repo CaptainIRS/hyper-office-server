@@ -72,10 +72,12 @@ exports.registerAndEnrollUser = async (caClient, wallet, orgMspId, userId, affil
 			enrollmentID: userId,
 			role: 'client'
 		}, adminUser);
+		console.log(`Successfully registered user ${userId}`);
 		const enrollment = await caClient.enroll({
 			enrollmentID: userId,
 			enrollmentSecret: secret
 		});
+		console.log(`Successfully enrolled user ${userId}`);
 		const x509Identity = {
 			credentials: {
 				certificate: enrollment.certificate,
@@ -85,7 +87,8 @@ exports.registerAndEnrollUser = async (caClient, wallet, orgMspId, userId, affil
 			type: 'X.509',
 		};
 		await wallet.put(userId, x509Identity);
-		console.log(`Successfully registered and enrolled user ${userId} and imported it into the wallet`);
+		console.log(`Successfully imported ${userId} it into the wallet`);
+		return x509Identity;
 	} catch (error) {
 		console.error(`Failed to register user : ${error}`);
 	}

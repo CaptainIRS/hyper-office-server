@@ -24,9 +24,6 @@ router.post('/set', async function(req, res) {
 })
 
 router.get('/list', async function(req, res) {
-    if(!req.user) {
-        return res.status(401).json({message: 'Unauthorized'});
-    }
     const roles = [ 'Administrator', 'Moderator', 'User' ];
     res.status(200).json(roles);  
 })

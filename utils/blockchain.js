@@ -22,19 +22,19 @@ const stakeholdersCA = CAUtil.buildCAClient(
 );
 
 module.exports.enrollUser = async (email) => {
-  const wallet = await AppUtil.buildWallet(fabricNetwork.Wallets, process.cwd() + '/wallet');
+  const wallet = await AppUtil.buildWallet(fabricNetwork.Wallets, process.cwd() + '/stakeholders-wallet');
   await CAUtil.enrollAdmin(stakeholdersCA, wallet, "StakeholdersMSP");
   return await CAUtil.registerAndEnrollUser(stakeholdersCA, wallet, "StakeholdersMSP", email, "stakeholders.user");
 }
 
 module.exports.enrollAdministrator = async (email) => {
-  const wallet = await AppUtil.buildWallet(fabricNetwork.Wallets, process.cwd() + '/wallet');
+  const wallet = await AppUtil.buildWallet(fabricNetwork.Wallets, process.cwd() + '/administration-wallet');
   await CAUtil.enrollAdmin(administrationCA, wallet, "AdministrationMSP");
   return await CAUtil.registerAndEnrollUser(administrationCA, wallet, "AdministrationMSP", email, "administration.administrator");
 }
 
 module.exports.enrollModerator = async (email) => {
-  const wallet = await AppUtil.buildWallet(fabricNetwork.Wallets, process.cwd() + '/wallet');
+  const wallet = await AppUtil.buildWallet(fabricNetwork.Wallets, process.cwd() + '/administration-wallet');
   await CAUtil.enrollAdmin(administrationCA, wallet, "AdministrationMSP");
   return await CAUtil.registerAndEnrollUser(administrationCA, wallet, "AdministrationMSP", email, "administration.moderator");
 }
@@ -43,11 +43,13 @@ const performTransaction = async (user, transactionName, transactionType, ...arg
   if (!["Administrator", "Moderator", "User"].includes(user.role)) {
     throw new Error("Invalid user");
   }
-  const wallet = await AppUtil.buildWallet(fabricNetwork.Wallets, process.cwd() + '/wallet');
+  let wallet;
   if (user.role === "User") {
+    wallet = await AppUtil.buildWallet(fabricNetwork.Wallets, process.cwd() + '/stakeholders-wallet');
     await CAUtil.enrollAdmin(stakeholdersCA, wallet, "StakeholdersMSP");
     await CAUtil.registerAndEnrollUser(stakeholdersCA, wallet, "StakeholdersMSP", user.email, "stakeholders.user");
   } else if (user.role === "Administrator" || user.role === "Moderator") {
+    wallet = await AppUtil.buildWallet(fabricNetwork.Wallets, process.cwd() + '/administration-wallet');
     let affiliation;
     if (user.role === "Administrator") {
       affiliation = "administration.administrator";
@@ -104,7 +106,12 @@ module.exports.queryFilesOfApprover = async (approver) => {
   return await performTransaction(owner, "queryFilesOfApprover", "evaluate", [approver]);
 }
 
-module.exports.getBlockchainUser = async (email) => {
-  const wallet = await AppUtil.buildWallet(fabricNetwork.Wallets, process.cwd() + '/wallet');
-  return await wallet.get(email);
+module.exports.getBlockchainUser = async (email, role) => {
+  if (user.role === "User") {
+    const wallet = await AppUtil.buildWallet(fabricNetwork.Wallets, process.cwd() + '/stakeholders-wallet');
+    return await wallet.get(email);
+  } else if (user.role === "Administrator" || user.role === "Moderator") {
+    const wallet = await AppUtil.buildWallet(fabricNetwork.Wallets, process.cwd() + '/administration-wallet');
+    return await wallet.get(email);
+  }
 }

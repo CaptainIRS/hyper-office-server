@@ -13,7 +13,7 @@ router.post('/register', async function(req, res, next) {
     } else if (role === 'Moderator') {
         await blockchain.enrollModerator(email);
     } else if (role === 'Administrator') {
-        await blockchain.enrollAdmin(email);
+        await blockchain.enrollAdministrator(email);
     } else {
         return res.status(400).json({message: 'Invalid role'});
     }

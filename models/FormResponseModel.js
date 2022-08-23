@@ -13,6 +13,10 @@ module.exports = {
             type: 'text',
             default: '',
         },
+        name: {
+            type: 'text',
+            default: '',
+        },
         stage: 'int',
         isDone: 'boolean',
         id: 'uuid',

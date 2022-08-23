@@ -1,11 +1,11 @@
 module.exports =  getTabs = (role) => {
     let tabs;
     if (role === 'Administrator') {
-        tabs = ['formBuilder', 'fileUpload', 'workflow', 'setRole', 'documentsForApproval', 'formViewer'];
+        tabs = ['formBuilder', 'fileUpload', 'workflow', 'documentsForApproval'];
     } else if(role === 'Moderator'){
-        tabs = ['fileUpload',  'showPdf'];
+        tabs = ['fileUpload',  'showPdf', 'documentsForApproval'];
     } else {
-        tabs = ['home', 'listProcessedDocs', 'listDocsToApply', 'listDocsUnderProcess'];
+        tabs = ['home', 'showApproved', 'showRejected', 'showPending', 'formViewer', 'viewdocs'];
     }
     return tabs;
 }

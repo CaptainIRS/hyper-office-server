@@ -88,6 +88,7 @@ router.post('/save_pdf', async function(req, res) {
         const file_buffer = Buffer.from(req.body.base64, 'base64');
         const ipfsFile = await ipfs.add(file_buffer);
         cid = ipfsFile.cid.toString();
+        const formName = await models.instance.Form.findOneAsync({id: models.uuidFromString(formId)});
         const savedResponse = new models.instance.FormResponse({
             email: req.user.email,
             form: models.uuidFromString(formId),
@@ -96,10 +97,11 @@ router.post('/save_pdf', async function(req, res) {
             stage: 0,
             isDone: false,
             id: models.uuid(),
+            name: formName.name,
         });
         await savedResponse.saveAsync();
         // res.status(200).send({message: 'Successfully saved form and PDF', cid: cid});
-        res.redirect(process.env.FRONTEND + '/viewdocs/' + cid);
+        res.redirect(process.env.FRONTEND + '/viewdocs/' + savedResponse.id);
     }
     catch (err) {
         console.log(err);
@@ -107,7 +109,7 @@ router.post('/save_pdf', async function(req, res) {
     }
 })
 
-router.get('/response/:id/view', async (req, res) => {
+router.get('/response/file/:id/view', async (req, res) => {
     const formResponse = await models.instance.FormResponse.findOneAsync({id: models.uuidFromString(req.params.id)});
     if (!formResponse) {
         res.status(404).json({message: 'Form response not found'});
@@ -244,6 +246,10 @@ router.get('/response/toapprove', async (req, res) => {
     const formResponseList = await models.instance.FormResponse.findAsync({}).filter(
         formResponse => formResponse.email == user.email && formResponse.nextDesignation == user.designation
         );
+    // change name of formResponseList
+    formResponseList.forEach(formResponse => {
+        formResponse.name = formResponse.name + ' doc from ' + formResponse.email;
+    });
     res.json(formResponseList);
 })
 

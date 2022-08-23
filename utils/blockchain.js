@@ -86,32 +86,32 @@ const performTransaction = async (user, transactionName, transactionType, ...arg
 }
 
 
-module.exports.addFile = async (owner, hash) => {
-  return await performTransaction(owner, "addFile", "submit", [owner, hash]);
+module.exports.addFile = async (owner, states, hash) => {
+  return await performTransaction(owner, "createDocument", "submit", JSON.stringify(owner), JSON.stringify(states), hash);
 }
 
-module.exports.getFile = async (fileId) => {
-  return await performTransaction(owner, "getFile", "evaluate", [fileId]);
+module.exports.getFile = async (owner, fileId) => {
+  return await performTransaction(owner, "readDocument", "evaluate", JSON.stringify(fileId));
 }
 
 module.exports.approveFile = async (fileId, approver, hash) => {
-  return await performTransaction(owner, "approveFile", "submit", [fileId, approver, hash]);
+  return await performTransaction(approver, "approveDocument", "submit", JSON.stringify(fileId), JSON.stringify(approver), hash);
 }
 
 module.exports.queryFilesOfOwner = async (owner) => {
-  return await performTransaction(owner, "queryFilesOfOwner", "evaluate", [owner]);
+  return await performTransaction(owner, "queryDocumentsOfOwner", "evaluate", JSON.stringify(owner));
 }
 
 module.exports.queryFilesOfApprover = async (approver) => {
-  return await performTransaction(owner, "queryFilesOfApprover", "evaluate", [approver]);
+  return await performTransaction(approver, "queryDocumentsOfApprover", "evaluate", JSON.stringify(approver));
 }
 
-module.exports.getBlockchainUser = async (email, role) => {
+module.exports.getBlockchainUser = async (user) => {
   if (user.role === "User") {
     const wallet = await AppUtil.buildWallet(fabricNetwork.Wallets, process.cwd() + '/stakeholders-wallet');
-    return await wallet.get(email);
+    return await wallet.get(user.email);
   } else if (user.role === "Administrator" || user.role === "Moderator") {
     const wallet = await AppUtil.buildWallet(fabricNetwork.Wallets, process.cwd() + '/administration-wallet');
-    return await wallet.get(email);
+    return await wallet.get(user.email);
   }
 }

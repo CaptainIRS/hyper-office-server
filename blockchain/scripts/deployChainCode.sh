@@ -44,7 +44,7 @@ if [ ! -d "$CC_SRC_PATH" ]; then
   fatalln "Path to chaincode does not exist. Please provide different path."
 fi
 
-CC_SRC_LANGUAGE=javascript
+CC_SRC_LANGUAGE=typescript
 
 CC_RUNTIME_LANGUAGE=node
 
@@ -69,6 +69,10 @@ fi
 packageChaincode() {
   FABRIC_CFG_PATH=$PWD/config/
   set -x
+  pushd $CC_SRC_PATH
+  npm install
+  npm run build
+  popd
   peer lifecycle chaincode package ${CC_NAME}.tar.gz --path ${CC_SRC_PATH} --lang ${CC_RUNTIME_LANGUAGE} --label ${CC_NAME}_${CC_VERSION} >&log.txt
   res=$?
   { set +x; } 2>/dev/null

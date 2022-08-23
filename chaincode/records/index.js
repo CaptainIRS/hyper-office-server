@@ -30,7 +30,7 @@ class DocumentContract extends Contract {
             currentState: 0,
             transactions: [{"action": "Created", "txId": ctx.stub.getTxID()}],
         };
-        const state = await ctx.stub.putState(this.fileId, Buffer.from(JSON.stringify(details)));
+        const state = await ctx.stub.putState(`${this.fileId}`, Buffer.from(JSON.stringify(details)));
         return state;
     }
 
@@ -45,7 +45,7 @@ class DocumentContract extends Contract {
         if (details.state[details.currentState + 1].designation === approver.role) {
             details.currentState++;
             details.transactions.push({"action": `Approved by ${approver.role}`, "txId": ctx.stub.getTxID()});
-            await ctx.stub.putState(fileId, Buffer.from(JSON.stringify(details)));
+            await ctx.stub.putState(`${fileId}`, Buffer.from(JSON.stringify(details)));
         } else {
             throw new Error(`File with ID ${fileId} cannot be approved by ${approver}`);
         }
@@ -58,17 +58,21 @@ class DocumentContract extends Contract {
                 owner: owner.email
             }
         };
-        return await ctx.stub.getQueryResultForQueryString(JSON.stringify(query));
+        return await ctx.stub.getQueryResult(JSON.stringify(query));
     }
 
     async queryFilesOfApprover(ctx, approver) {
         console.log(`Querying files of approver: ${JSON.stringify(approver)}`);
         let query = {
             selector: {
-                "state.designation": approver.role
+                states: {
+                    $elemMatch: {
+                        designation: approver.role
+                    }
+                }
             }
         };
-        return await ctx.stub.getQueryResultForQueryString(JSON.stringify(query));
+        return await ctx.stub.getQueryResult(JSON.stringify(query));
     }
 }
 

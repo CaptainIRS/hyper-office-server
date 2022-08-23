@@ -26,6 +26,9 @@ export class Document {
     public pendingStates: State[];
 
     @Property()
+    public currentStatus: 'Pending' | 'Completed' | 'Rejected';
+
+    @Property()
     public transactions: string;
 
 }

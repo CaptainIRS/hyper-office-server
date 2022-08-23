@@ -7,7 +7,7 @@ const moderator = { email: "moderator@administration.hyper-office.com", role: "M
 const green = "\x1b[32m";
 const clear = "\x1b[0m";
 
-const testFlow = async () => {
+const approveTestFlow = async () => {
     console.log(`${green}Adding file to blockchain...${clear}`);
     const fileId = (await blockchain.addFile(
         user,
@@ -59,8 +59,59 @@ const testFlow = async () => {
     } catch (e) {
         console.log(`${green}File approval failed as expected: ${e.message}${clear}`);
     }
+
+    console.log(`${green}Rejecting file as moderator (should fail)...${clear}`);
+    try {
+        await blockchain.rejectFile(parseInt(fileId), moderator);
+    } catch (e) {
+        console.log(`${green}File rejection failed as expected: ${e.message}${clear}`);
+    }    
 };
 
-testFlow().then(() => {
-    console.log("Done");
+const rejectTestFlow = async () => {
+    console.log(`${green}Adding file to blockchain...${clear}`);
+    const fileId = (await blockchain.addFile(
+        user,
+            [
+                { status: "Approval by Administrator", designation: "Administrator" },
+                { status: "Approval by Moderator", designation: "Moderator" },
+            ],
+            "hash1"
+        )).toString();
+    console.log(`${green}File added to blockchain with id: ${fileId}${clear}`);
+
+    console.log(`${green}Getting file from blockchain...${clear}`);
+    console.log((await blockchain.getFile(user, parseInt(fileId))).toString());
+
+    console.log(`${green}Querying files of owner...${clear}`);
+    console.log((await blockchain.queryFilesOfOwner(user)).toString());
+
+    console.log(`${green}Rejecting file as moderator (should fail)...${clear}`);
+    try {
+        await blockchain.rejectFile(parseInt(fileId), moderator);
+    } catch (e) {
+        console.log(`${green}File rejection failed as expected: ${e.message}${clear}`);
+    }
+
+    console.log(`${green}Rejecting file as administrator (should succeed)...${clear}`);
+    await blockchain.rejectFile(parseInt(fileId), administrator);
+
+    console.log(`${green}Rejecting file as moderator (should fail)...${clear}`);
+    try {
+        await blockchain.rejectFile(parseInt(fileId), moderator);
+    } catch (e) {
+        console.log(`${green}File rejection failed as expected: ${e.message}${clear}`);
+    }
+}
+
+const runTestFlow = async () => {
+    console.log(`${green}Running test flow...${clear}`);
+    await approveTestFlow();
+    console.log(`${green}Approve test flow completed successfully${clear}`);
+    await rejectTestFlow();
+    console.log(`${green}Reject test flow completed successfully${clear}`);
+}
+
+runTestFlow().then(() => {
+    console.log(`${green}Test flow completed successfully${clear}`);
 });

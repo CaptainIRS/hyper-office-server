@@ -98,6 +98,10 @@ module.exports.approveFile = async (fileId, approver, hash) => {
   return await performTransaction(approver, "approveDocument", "submit", JSON.stringify(fileId), JSON.stringify(approver), hash);
 }
 
+module.exports.rejectFile = async (fileId, rejector) => {
+  return await performTransaction(rejector, "rejectDocument", "submit", JSON.stringify(fileId), JSON.stringify(rejector));
+}
+
 module.exports.queryFilesOfOwner = async (owner) => {
   return await performTransaction(owner, "queryDocumentsOfOwner", "evaluate", JSON.stringify(owner));
 }

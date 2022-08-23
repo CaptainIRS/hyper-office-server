@@ -40,7 +40,13 @@ export class DocumentContract extends Contract {
         document.hash = hash;
         document.pendingStates = states;
         document.completedStates = [createdState];
-        document.nextState = document.pendingStates[0] || null;
+        if (document.pendingStates.length > 0) {
+            document.nextState = document.pendingStates[0];
+            document.currentStatus = 'Pending';
+        } else {
+            document.nextState = null;
+            document.currentStatus = 'Completed';
+        }
         const transactions: TransactionInfo[] = [
             {
                 txId: ctx.stub.getTxID(),
@@ -69,7 +75,6 @@ export class DocumentContract extends Contract {
     }
 
     @Transaction()
-    @Returns('Document')
     public async approveDocument(ctx: Context, documentId: string, approver: User, newHash: string): Promise<void> {
         console.log(`Approving document ${documentId} by ${JSON.stringify(approver)}`);
         const exists: boolean = await this.documentExists(ctx, documentId);
@@ -85,7 +90,13 @@ export class DocumentContract extends Contract {
         }
         document.completedStates.push(document.nextState);
         document.pendingStates.shift();
-        document.nextState = document.pendingStates[0] || null;
+        if (document.pendingStates.length > 0) {
+            document.nextState = document.pendingStates[0];
+            document.currentStatus = 'Pending';
+        } else {
+            document.nextState = null;
+            document.currentStatus = 'Completed';
+        }
         document.hash = newHash;
         const transactions = JSON.parse(document.transactions) as TransactionInfo[];
         transactions.push({
@@ -98,9 +109,38 @@ export class DocumentContract extends Contract {
         await ctx.stub.putState(documentId, buffer);
     }
 
+    @Transaction()
+    public async rejectDocument(ctx: Context, documentId: string, rejector: User): Promise<void> {
+        console.log(`Rejecting document ${documentId} by ${JSON.stringify(rejector)}`);
+        const exists: boolean = await this.documentExists(ctx, documentId);
+        if (!exists) {
+            throw new Error(`The document ${documentId} does not exist`);
+        }
+        const document: Document = await this.readDocument(ctx, documentId);
+        if (document.nextState === null) {
+            throw new Error(`The document ${documentId} is already processed`);
+        }
+        if (document.nextState.designation !== rejector.role) {
+            throw new Error(`The user ${rejector.email} is not authorized to reject the document ${documentId}`);
+        }
+        const rejectedState: State = {status: 'Rejected', designation: rejector.role};
+        document.completedStates.push(rejectedState);
+        document.nextState = null;
+        document.currentStatus = 'Rejected';
+        const transactions = JSON.parse(document.transactions) as TransactionInfo[];
+        transactions.push({
+            txId: ctx.stub.getTxID(),
+            timestamp: new Date().toString(),
+            message: `Document rejected by ${rejector.email}`
+        });
+        document.transactions = JSON.stringify(transactions);
+        const buffer: Buffer = Buffer.from(JSON.stringify(document));
+        await ctx.stub.putState(documentId, buffer);
+    }
+
     @Transaction(false)
-    @Returns('string')
-    async queryDocumentsOfOwner(ctx: Context, owner: User): Promise<string> {
+    @Returns('Array<Document>')
+    async queryDocumentsOfOwner(ctx: Context, owner: User): Promise<Document[]> {
         console.log(`Querying documents of owner ${JSON.stringify(owner)}`);
         const query = {
             selector: {
@@ -122,12 +162,12 @@ export class DocumentContract extends Contract {
             result = await iterator.next();
         }
         await iterator.close();
-        return JSON.stringify(documents);
+        return documents;
     }
 
     @Transaction(false)
-    @Returns('string')
-    async queryDocumentsOfApprover(ctx: Context, approver: User): Promise<string> {
+    @Returns('Array<Document>')
+    async queryDocumentsOfApprover(ctx: Context, approver: User): Promise<Document[]> {
         console.log(`Querying documents of approver ${JSON.stringify(approver)}`);
         const query = {
             selector: {
@@ -149,6 +189,6 @@ export class DocumentContract extends Contract {
             result = await iterator.next();
         }
         await iterator.close();
-        return JSON.stringify(documents);
+        return documents;
     }
 }

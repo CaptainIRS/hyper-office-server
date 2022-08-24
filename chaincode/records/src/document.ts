@@ -14,6 +14,9 @@ import { User } from './user';
 export class Document {
 
     @Property()
+    public id: number;
+
+    @Property()
     public owner: User;
 
     @Property()
@@ -33,5 +36,8 @@ export class Document {
 
     @Property('transactions', 'Array<TransactionInfo>')
     public transactions: TransactionInfo[];
+
+    @Property()
+    public name: string;
 
 }

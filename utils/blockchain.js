@@ -86,8 +86,8 @@ const performTransaction = async (user, transactionName, transactionType, ...arg
 }
 
 
-module.exports.addFile = async (owner, states, hash) => {
-  return await performTransaction(owner, "createDocument", "submit", JSON.stringify(owner), JSON.stringify(states), hash);
+module.exports.addFile = async (owner, states, hash, name) => {
+  return await performTransaction(owner, "createDocument", "submit", JSON.stringify(owner), JSON.stringify(states), hash, name);
 }
 
 module.exports.getFile = async (owner, fileId) => {

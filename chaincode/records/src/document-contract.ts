@@ -11,7 +11,7 @@ import { TransactionInfo } from './transaction-info';
 import './user';
 import { User } from './user';
 
-@Info({title: 'DocumentContract', description: 'Contract for HyperOffice' })
+@Info({ title: 'DocumentContract', description: 'Contract for HyperOffice' })
 export class DocumentContract extends Contract {
     @Property()
     documentId: number;
@@ -33,14 +33,16 @@ export class DocumentContract extends Contract {
     @Transaction()
     @Param('states', 'Array<State>')
     @Returns('number')
-    public async createDocument(ctx: Context, owner: User,  states: State[], hash: string): Promise<number> {
+    public async createDocument(ctx: Context, owner: User, states: State[], hash: string, name: string): Promise<number> {
         console.log(`Creating document with owner ${JSON.stringify(owner)} and states ${JSON.stringify(states)}`);
         const document: Document = new Document();
-        const createdState: State = {status: 'Created', designation: owner.role};
+        const createdState: State = { status: 'Created', designation: owner.role };
         document.owner = owner;
         document.hash = hash;
         document.pendingStates = states;
         document.completedStates = [createdState];
+        document.name = name;
+        document.id = ++this.documentId;
         if (document.pendingStates.length > 0) {
             document.nextState = document.pendingStates[0];
             document.currentStatus = 'Pending';
@@ -57,7 +59,7 @@ export class DocumentContract extends Contract {
         ];
         document.transactions = transactions;
         const buffer: Buffer = Buffer.from(JSON.stringify(document));
-        await ctx.stub.putState(`${++this.documentId}`, buffer);
+        await ctx.stub.putState(`${this.documentId}`, buffer);
         return this.documentId;
     }
 
@@ -124,7 +126,7 @@ export class DocumentContract extends Contract {
         if (document.nextState.designation !== rejector.role) {
             throw new Error(`The user ${rejector.email} is not authorized to reject the document ${documentId}`);
         }
-        const rejectedState: State = {status: 'Rejected', designation: rejector.role};
+        const rejectedState: State = { status: 'Rejected', designation: rejector.role };
         document.completedStates.push(rejectedState);
         document.nextState = null;
         document.currentStatus = 'Rejected';

@@ -2,9 +2,9 @@ var express = require('express');
 var router = express.Router();
 var models = require('../utils/cassandra');
 var ipfs = require('../utils/ipfs');
-var cid = require('cids');
 var stream = require('stream')
 var all = require('it-all');
+const { addFile, getFile, approveFile, queryFilesOfOwner, rejectFile, queryFilesOfApprover } = require('../utils/blockchain');
 var uint8ArrayConcat = require('uint8arrays/concat').concat;
 
 router.post('/create_form', async function(req, res) {
@@ -83,6 +83,8 @@ router.get('/get_form', async function(req, res) {
         res.status(500).send({message: `Failed to get ${req.query.id}`});
     }
 });
+
+/*
 
 router.post('/save_pdf', async function(req, res) {
     try {
@@ -245,7 +247,7 @@ router.get('/response/toapprove', async (req, res) => {
         return res.status(403).json({message: 'You are not a moderator'});
     }
     const formResponseList = await models.instance.FormResponse.findAsync({}).filter(
-        formResponse => formResponse.email == user.email && formResponse.nextDesignation == user.designation
+        formResponse => formResponse.nextDesignation == user.designation
         );
     // change name of formResponseList
     formResponseList.forEach(formResponse => {
@@ -276,7 +278,205 @@ router.get('/approval_status/:id', async (req, res) => {
 	const formName = await models.instance.Form.findOneAsync({id: models.uuidFromString(req.params.id)}, {select: ['name']});
         return res.status(200).json({name: formName.name, approval_status});
     } catch(err) {
-        res.status(500).send({message: `Failed to get approval status for form ${req.params.id}`});   
+        res.status(500).send({message: `Failed to get approval status for form ${req.params.id}`});
+    }
+})   
+
+*/
+
+router.post('/save_pdf', async function(req, res) {
+    try {
+        const { formId, fileName } = req.body;
+        const file_buffer = Buffer.from(req.body.base64, 'base64');
+        const ipfsFile = await ipfs.add(file_buffer);
+        const hash = ipfsFile.cid.toString();
+        if (!req.user) return res.status(401).send({message: 'Unauthorized'});
+        const { email, role } = req.user;
+        const owner = { email, role };
+        const form = await models.instance.Form.findOneAsync({ id: models.uuidFromString(formId) });
+        if (!form) {
+            return res.status(400).json({message: 'Invalid form id'});
+        }
+        const workflow = await models.instance.Workflow.findOneAsync({ id: form.workflow });
+        if (!workflow) {
+            return res.status(500).json({message: 'Invalid workflow id in form'});
+        }
+        const states = workflow.state;
+        const documentId = (await addFile(owner, states, hash, fileName)).toString();
+        res.redirect(process.env.FRONTEND + '/viewdocs/' + documentId);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send({message: 'Failed to save form response'});
+    }
+})
+
+router.get('/response/file/:id/view', async (req, res) => {
+    if (!req.user) return res.status(401).send({message: 'Unauthorized'});
+    const { email, role } = req.user;
+    const owner = { email, role };
+    try {
+        const document = JSON.parse(await getFile(owner, parseInt(req.params.id)));
+        if (!document) {
+            res.status(404).json({message: 'Document not found'});
+        }
+        const fileBuffer = uint8ArrayConcat(await all(ipfs.cat(document.hash)));
+        const readStream = new stream.PassThrough();
+
+        readStream.end(fileBuffer);
+        res.set('Content-Disposition', 'inline');
+        res.set('Content-Type', 'application/pdf');
+        readStream.pipe(res);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send({message: 'Failed to get file'});
+    }
+})
+
+router.patch('/response/:id/approve', async (req, res) => {
+    if (!req.user) return res.status(401).send({message: 'Unauthorized'});
+    const { email, role } = req.user;
+    const approver = { email, role };
+    let newHash = 'newhash'; // sign pdf
+    try {
+        const document = JSON.parse(await getFile(approver, parseInt(req.params.id)));
+        if (!document) {
+            return res.status(404).json({message: 'Document not found'});
+        }
+        if (document.nextState === null) {
+            return res.status(400).json({message: 'Document already approved'});
+        }
+        if (document.nextState.designation !== approver.role) {
+            return res.status(401).json({message: 'Unauthorized'})
+        }
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).send({message: 'Failed to get file'});
+    }
+    try {
+        await approveFile(parseInt(req.params.id), approver, newHash);
+        res.json({message: 'Approved'});
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).json({message: 'Failed to approve document'});
+    }
+})
+
+router.patch('/response/:id/reject', async (req, res) => {
+    if (!req.user) return res.status(401).send({message: 'Unauthorized'});
+    const { email, role } = req.user;
+    const rejector = { email, role };
+    let newHash = 'newhash'; // sign pdf
+    try {
+        const document = JSON.parse(await getFile(rejector, parseInt(req.params.id)));
+        if (!document) {
+            return res.status(404).json({message: 'Document not found'});
+        }
+        if (document.nextState === null) {
+            return res.status(400).json({message: 'Document already processed'});
+        }
+        if (document.nextState.designation !== rejector.role) {
+            return res.status(401).json({message: 'Unauthorized'})
+        }
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).send({message: 'Failed to get file'});
+    }
+    try {
+        await rejectFile(parseInt(req.params.id), rejector);
+        res.json({message: 'Rejected'});
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).json({message: 'Failed to reject document'});
+    }
+})
+
+router.get('/response/approved', async (req, res) => {
+    if (!req.user) return res.status(401).send({message: 'Unauthorized'});
+    const { email, role } = req.user;
+    if (role !== 'User') return res.status(401).send({message: 'Unauthorized'});
+    const owner = { email, role };
+    try {
+        const ownerDocuments = JSON.parse(await queryFilesOfOwner(owner));
+        res.json(ownerDocuments.filter(document => document.currentStatus === 'Completed'));
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send({message: 'Failed to get approved documents'});
+    }
+})
+
+router.get('/response/rejected', async (req, res) => {
+    if (!req.user) return res.status(401).send({message: 'Unauthorized'});
+    const { email, role } = req.user;
+    if (role !== 'User') return res.status(401).send({message: 'Unauthorized'});
+    const owner = { email, role };
+    try {
+        const ownerDocuments = JSON.parse(await queryFilesOfOwner(owner));
+        res.json(ownerDocuments.filter(document => document.currentStatus === 'Rejected'));
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send({message: 'Failed to get rejected documents'});
+    }
+})
+
+router.get('/response/processing', async (req, res) => {
+    if (!req.user) return res.status(401).send({message: 'Unauthorized'});
+    const { email, role } = req.user;
+    if (role !== 'User') return res.status(401).send({message: 'Unauthorized'});
+    const owner = { email, role };
+    try {
+        const ownerDocuments = JSON.parse(await queryFilesOfOwner(owner));
+        res.json(ownerDocuments.filter(document => document.currentStatus === 'Pending'));
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send({message: 'Failed to get rejected documents'});
+    }
+})
+
+router.get('/response/toapprove', async (req, res) => {
+    if (!req.user) return res.status(401).send({message: 'Unauthorized'});
+    const { email, role } = req.user;
+    if (role === 'User') return res.status(401).send({message: 'Unauthorized'});
+    const approver = { email, role };
+    try {
+        const documents = JSON.parse(await queryFilesOfApprover(approver));
+        documents.forEach(document => {if (!document.name) document.name = 'Document from ' + document.owner.email});
+        res.json(documents.filter(document => document.nextState.designation === approver.role));
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send({message: 'Failed to get documents to be approved'});
+    }
+})
+
+router.get('/all', async (req, res) => {
+    if (!req.user) return res.status(401).send({message: 'Unauthorized'});
+    const { email, role } = req.user;
+    try {
+        let forms = await models.instance.Form.findAsync({}, {select: ['name','id']});
+        if (role === 'User') {
+            const owner = { email, role };
+            const documents = JSON.parse(await queryFilesOfOwner(owner));
+            forms = forms.filter(form =>
+                {
+                    const filteredDocs = documents.find(doc => doc.formId === form.id);
+                    return !filteredDocs || filteredDocs.every(doc => doc.currentStatus === 'Rejected');
+                }
+            );
+        }
+        res.json(forms);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send({message: 'Failed to get forms'});
     }
 })
 

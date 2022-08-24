@@ -5,6 +5,9 @@
 import { Object, Property } from 'fabric-contract-api';
 import './state';
 import { State } from './state';
+import './transaction-info';
+import { TransactionInfo } from './transaction-info';
+import './user';
 import { User } from './user';
 
 @Object()
@@ -28,7 +31,7 @@ export class Document {
     @Property()
     public currentStatus: 'Pending' | 'Completed' | 'Rejected';
 
-    @Property()
-    public transactions: string;
+    @Property('transactions', 'Array<TransactionInfo>')
+    public transactions: TransactionInfo[];
 
 }

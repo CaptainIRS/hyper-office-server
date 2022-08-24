@@ -6,6 +6,7 @@ import { Context, Contract, Info, Param, Property, Returns, Transaction } from '
 import { Document } from './document';
 import './state';
 import { State } from './state';
+import './transaction-info';
 import { TransactionInfo } from './transaction-info';
 import './user';
 import { User } from './user';
@@ -54,7 +55,7 @@ export class DocumentContract extends Contract {
                 message: 'Document created'
             }
         ];
-        document.transactions = JSON.stringify(transactions);
+        document.transactions = transactions;
         const buffer: Buffer = Buffer.from(JSON.stringify(document));
         await ctx.stub.putState(`${++this.documentId}`, buffer);
         return this.documentId;
@@ -98,13 +99,13 @@ export class DocumentContract extends Contract {
             document.currentStatus = 'Completed';
         }
         document.hash = newHash;
-        const transactions = JSON.parse(document.transactions) as TransactionInfo[];
+        const transactions = document.transactions;
         transactions.push({
             txId: ctx.stub.getTxID(),
             timestamp: new Date().toString(),
             message: `Document approved by ${approver.email}`
         });
-        document.transactions = JSON.stringify(transactions);
+        document.transactions = transactions;
         const buffer: Buffer = Buffer.from(JSON.stringify(document));
         await ctx.stub.putState(documentId, buffer);
     }
@@ -127,13 +128,13 @@ export class DocumentContract extends Contract {
         document.completedStates.push(rejectedState);
         document.nextState = null;
         document.currentStatus = 'Rejected';
-        const transactions = JSON.parse(document.transactions) as TransactionInfo[];
+        const transactions = document.transactions;
         transactions.push({
             txId: ctx.stub.getTxID(),
             timestamp: new Date().toString(),
             message: `Document rejected by ${rejector.email}`
         });
-        document.transactions = JSON.stringify(transactions);
+        document.transactions = transactions;
         const buffer: Buffer = Buffer.from(JSON.stringify(document));
         await ctx.stub.putState(documentId, buffer);
     }

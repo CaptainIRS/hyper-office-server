@@ -3,7 +3,7 @@ module.exports =  getTabs = (role) => {
     if (role === 'Administrator') {
         tabs = ['formBuilder', 'fileUpload', 'workflow', 'documentsForApproval'];
     } else if(role === 'Moderator'){
-        tabs = ['fileUpload',  'showPdf', 'documentsForApproval'];
+        tabs = ['fileUpload', 'documentsForApproval'];
     } else {
         tabs = ['home', 'showApproved', 'showRejected', 'showPending', 'formViewer', 'viewdocs'];
     }

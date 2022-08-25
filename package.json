@@ -6,6 +6,7 @@
     "start": "docker-compose up -d cassandra redis && nodemon ./bin/www"
   },
   "dependencies": {
+    "@elastic/elasticsearch": "^8.2.1",
     "bcrypt": "^5.0.1",
     "cassandra-driver": "^4.6.4",
     "cids": "^1.1.9",

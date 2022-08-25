@@ -437,7 +437,7 @@ router.get('/response/processing', async (req, res) => {
     }
     catch (err) {
         console.log(err);
-        res.status(500).send({message: 'Failed to get rejected documents'});
+        res.status(500).send({message: 'Failed to get pending documents'});
     }
 })
 
@@ -454,6 +454,23 @@ router.get('/response/toapprove', async (req, res) => {
     catch (err) {
         console.log(err);
         res.status(500).send({message: 'Failed to get documents to be approved'});
+    }
+})
+
+router.get('/response/doc_status/:id', async (req, res) => {
+    if (!req.user) return res.status(401).send({message: 'Unauthorized'});
+    const { email, role } = req.user;
+    if (role !== 'User') return res.status(401).send({message: 'Unauthorized'});
+    const owner = { email, role };
+    try {
+        const ownerDocuments = JSON.parse(await queryFilesOfOwner(owner));
+        const result = ownerDocuments.find(document => document.id === parseInt(req.params.id));
+        // console.log(result);
+        res.json(result);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send({message: 'Failed to get document status'});
     }
 })
 

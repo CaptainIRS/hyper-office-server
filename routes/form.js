@@ -8,12 +8,13 @@ var all = require('it-all');
 var uint8ArrayConcat = require('uint8arrays/concat').concat;
 
 router.post('/create_form', async function(req, res) {
-    const {name, data, workflow} = req.body;
+    const {name, data, workflow, dependsOnForms} = req.body;
     try {
         const form = new models.instance.Form({
             name: name,
             data: data,
             workflow: models.uuidFromString(workflow),
+            depends_on: dependsOnForms,
             id: models.uuid(),
         });
         await form.saveAsync();
@@ -26,12 +27,13 @@ router.post('/create_form', async function(req, res) {
 
 
 router.post('/update_form', async function(req, res) {
-    const {name, data, id, workflow} = req.body;
+    const {name, data, id, workflow, dependsOnForms} = req.body;
     try {
         const form = await models.instance.Form.findOneAsync({id: models.uuidFromString(id)});
         form.name = name;
         form.data = data;
         form.workflow = models.uuidFromString(workflow);
+        form.depends_on = dependsOnForms;
         await form.saveAsync();
         res.status(200).json({message: 'Form Updated'});
     } catch (err) {
@@ -62,15 +64,15 @@ router.get('/form_list', async function(req, res) {
 router.get('/get_form', async function(req, res) {
     try {
         const form = await models.instance.Form.findOneAsync({id: models.uuidFromString(req.query.id)});
-        let saved_response;
+        let savedResponse;
         try {
-            saved_response = await models.instance.FormResponse.findOneAsync({form: models.uuidFromString(req.query.id), email: req.user.email});
+            savedResponse = await models.instance.FormResponse.findOneAsync({form: models.uuidFromString(req.query.id), email: req.user.email});
         } catch (err) {
             console.log("No saved response");
         }
         if (form) {
-            if (saved_response) {
-                res.send({form: form.toJSON(), saved_response: saved_response.toJSON()})
+            if (savedResponse) {
+                res.send({form: form.toJSON(), saved_response: savedResponse.toJSON()})
             } else {
                 res.send({form: form.toJSON()})
             }
@@ -88,7 +90,6 @@ router.post('/save_pdf', async function(req, res) {
         const file_buffer = Buffer.from(req.body.base64, 'base64');
         const ipfsFile = await ipfs.add(file_buffer);
         cid = ipfsFile.cid.toString();
-        const formName = await models.instance.Form.findOneAsync({id: models.uuidFromString(formId)});
         const savedResponse = new models.instance.FormResponse({
             email: req.user.email,
             form: models.uuidFromString(formId),
@@ -251,6 +252,32 @@ router.get('/response/toapprove', async (req, res) => {
         formResponse.name = formResponse.name + ' doc from ' + formResponse.email;
     });
     res.json(formResponseList);
+})
+
+router.get('/approval_status/:id', async (req, res) => {
+    const user = req.user;
+    if (!user) {
+        return res.status(401).json({message: 'Unauthorized'});
+    }
+    try {
+	let approval_status = '';
+	try {
+	    const formResponse = await models.instance.FormResponse.findOneAsync({form: models.uuidFromString(req.params.id), email: req.user.email});
+            if (formResponse.isDone) {
+                approval_status = 'Approved';
+	    } else if (formResponse.stage === -1) {
+                approval_status = 'Rejected';
+	    } else {
+		approval_status = 'Processing';
+	    }
+	} catch (err) {
+	    approval_status = 'Not Filled';
+	}
+	const formName = await models.instance.Form.findOneAsync({id: models.uuidFromString(req.params.id)}, {select: ['name']});
+        return res.status(200).json({name: formName.name, approval_status});
+    } catch(err) {
+        res.status(500).send({message: `Failed to get approval status for form ${req.params.id}`});   
+    }
 })
 
 module.exports = router;

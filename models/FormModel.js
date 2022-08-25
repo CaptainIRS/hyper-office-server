@@ -9,7 +9,11 @@ module.exports = {
         id: {
             type: 'uuid'
         },
-        workflow: 'uuid'
+        workflow: 'uuid',
+        depends_on: {
+            type: 'frozen',
+            typeDef: '<list<uuid>>'
+        }
     },
     key: ['id'],
     options: {

@@ -5,7 +5,7 @@ const path = require('path');
 
 exports.buildCCPAdministration = () => {
 	// load the common connection configuration file
-	const ccpPath = path.resolve(__dirname, '..', '..', 'blockchain', 'organizations', 'peerOrganizations', 'administration.hyper-office.com', 'connection-administration.json');
+	const ccpPath = path.resolve(__dirname, '..', '..', 'blockchain', 'organizations', 'peerOrganizations', 'administration.hyper-office.tech', 'connection-administration.json');
 	const fileExists = fs.existsSync(ccpPath);
 	if (!fileExists) {
 		throw new Error(`no such file or directory: ${ccpPath}`);
@@ -22,7 +22,7 @@ exports.buildCCPAdministration = () => {
 exports.buildCCPStakeholders = () => {
 	// load the common connection configuration file
 	const ccpPath = path.resolve(__dirname, '..', '..', 'blockchain',
-		'organizations', 'peerOrganizations', 'stakeholders.hyper-office.com', 'connection-stakeholders.json');
+		'organizations', 'peerOrganizations', 'stakeholders.hyper-office.tech', 'connection-stakeholders.json');
 	const fileExists = fs.existsSync(ccpPath);
 	if (!fileExists) {
 		throw new Error(`no such file or directory: ${ccpPath}`);

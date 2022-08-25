@@ -1,8 +1,11 @@
 const blockchain = require("./blockchain");
+require('dotenv').config();
 
-const user = { email: "user@stakeholders.hyper-office.com", role: "User" };
-const administrator = { email: "administrator@administration.hyper-office.com", role: "Administrator" };
-const moderator = { email: "moderator@administration.hyper-office.com", role: "Moderator" };
+const rand = Math.floor(Math.random() * 10000);
+
+const user = { email: `user${rand}@stakeholders.hyper-office.tech`, role: "User" };
+const administrator = { email: `administrator${rand}@administration.hyper-office.tech`, role: "Administrator" };
+const moderator = { email: `moderator${rand}@administration.hyper-office.tech`, role: "Moderator" };
 
 const green = "\x1b[32m";
 const clear = "\x1b[0m";

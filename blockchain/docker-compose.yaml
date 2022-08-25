@@ -6,16 +6,16 @@ volumes:
   pgdata:
 
 networks:
-  hyper-office.com:
+  hyper-office.tech:
     external:
       name: net_test
 
 services:
 
-  explorerdb.hyper-office.com:
+  explorerdb.hyper-office.tech:
     image: hyperledger/explorer-db:latest
-    container_name: explorerdb.hyper-office.com
-    hostname: explorerdb.hyper-office.com
+    container_name: explorerdb.hyper-office.tech
+    hostname: explorerdb.hyper-office.tech
     environment:
       - DATABASE_DATABASE=fabricexplorer
       - DATABASE_USERNAME=hppoc
@@ -28,14 +28,14 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-      - hyper-office.com
+      - hyper-office.tech
 
-  explorer.hyper-office.com:
+  explorer.hyper-office.tech:
     image: hyperledger/explorer:latest
-    container_name: explorer.hyper-office.com
-    hostname: explorer.hyper-office.com
+    container_name: explorer.hyper-office.tech
+    hostname: explorer.hyper-office.tech
     environment:
-      - DATABASE_HOST=explorerdb.hyper-office.com
+      - DATABASE_HOST=explorerdb.hyper-office.tech
       - DATABASE_DATABASE=fabricexplorer
       - DATABASE_USERNAME=hppoc
       - DATABASE_PASSWD=password
@@ -51,7 +51,7 @@ services:
     ports:
       - 9999:8080
     depends_on:
-      explorerdb.hyper-office.com:
+      explorerdb.hyper-office.tech:
         condition: service_healthy
     networks:
-      - hyper-office.com
+      - hyper-office.tech

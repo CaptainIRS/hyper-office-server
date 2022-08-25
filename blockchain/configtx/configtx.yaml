@@ -25,7 +25,7 @@ Organizations:
         ID: OrdererMSP
 
         # MSPDir is the filesystem path which contains the MSP configuration
-        MSPDir: ../organizations/ordererOrganizations/hyper-office.com/msp
+        MSPDir: ../organizations/ordererOrganizations/hyper-office.tech/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -42,7 +42,7 @@ Organizations:
                 Rule: "OR('OrdererMSP.admin')"
 
         OrdererEndpoints:
-            - orderer.hyper-office.com:7050
+            - orderer.hyper-office.tech:7050
 
     - &Administration
         # DefaultOrg defines the organization which is used in the sampleconfig
@@ -52,7 +52,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: AdministrationMSP
 
-        MSPDir: ../organizations/peerOrganizations/administration.hyper-office.com/msp
+        MSPDir: ../organizations/peerOrganizations/administration.hyper-office.tech/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -79,7 +79,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: StakeholdersMSP
 
-        MSPDir: ../organizations/peerOrganizations/stakeholders.hyper-office.com/msp
+        MSPDir: ../organizations/peerOrganizations/stakeholders.hyper-office.tech/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -209,14 +209,14 @@ Orderer: &OrdererDefaults
     # as TLS validation.  The preferred way to specify orderer addresses is now
     # to include the OrdererEndpoints item in your org definition
     Addresses:
-        - orderer.hyper-office.com:7050
+        - orderer.hyper-office.tech:7050
 
     EtcdRaft:
         Consenters:
-        - Host: orderer.hyper-office.com
+        - Host: orderer.hyper-office.tech
           Port: 7050
-          ClientTLSCert: ../organizations/ordererOrganizations/hyper-office.com/orderers/orderer.hyper-office.com/tls/server.crt
-          ServerTLSCert: ../organizations/ordererOrganizations/hyper-office.com/orderers/orderer.hyper-office.com/tls/server.crt
+          ClientTLSCert: ../organizations/ordererOrganizations/hyper-office.tech/orderers/orderer.hyper-office.tech/tls/server.crt
+          ServerTLSCert: ../organizations/ordererOrganizations/hyper-office.tech/orderers/orderer.hyper-office.tech/tls/server.crt
 
     # Batch Timeout: The amount of time to wait before creating a batch
     BatchTimeout: 2s

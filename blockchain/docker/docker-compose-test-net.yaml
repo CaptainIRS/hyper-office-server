@@ -1,17 +1,17 @@
 version: '2'
 
 volumes:
-  orderer.hyper-office.com:
-  peer0.administration.hyper-office.com:
-  peer0.stakeholders.hyper-office.com:
+  orderer.hyper-office.tech:
+  peer0.administration.hyper-office.tech:
+  peer0.stakeholders.hyper-office.tech:
 
 networks:
   test:
 
 services:
 
-  orderer.hyper-office.com:
-    container_name: orderer.hyper-office.com
+  orderer.hyper-office.tech:
+    container_name: orderer.hyper-office.tech
     image: hyperledger/fabric-orderer:$IMAGE_TAG
     environment:
       - FABRIC_LOGGING_SPEC=INFO
@@ -35,16 +35,16 @@ services:
     command: orderer
     volumes:
         - ../system-genesis-block/genesis.block:/var/hyperledger/orderer/genesis.block
-        - ../organizations/ordererOrganizations/hyper-office.com/orderers/orderer.hyper-office.com/msp:/var/hyperledger/orderer/msp
-        - ../organizations/ordererOrganizations/hyper-office.com/orderers/orderer.hyper-office.com/tls/:/var/hyperledger/orderer/tls
-        - orderer.hyper-office.com:/var/hyperledger/production/orderer
+        - ../organizations/ordererOrganizations/hyper-office.tech/orderers/orderer.hyper-office.tech/msp:/var/hyperledger/orderer/msp
+        - ../organizations/ordererOrganizations/hyper-office.tech/orderers/orderer.hyper-office.tech/tls/:/var/hyperledger/orderer/tls
+        - orderer.hyper-office.tech:/var/hyperledger/production/orderer
     ports:
       - 7050:7050
     networks:
       - test
 
-  peer0.administration.hyper-office.com:
-    container_name: peer0.administration.hyper-office.com
+  peer0.administration.hyper-office.tech:
+    container_name: peer0.administration.hyper-office.tech
     image: hyperledger/fabric-peer:$IMAGE_TAG
     environment:
       #Generic peer variables
@@ -61,19 +61,19 @@ services:
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
       # Peer specific variabes
-      - CORE_PEER_ID=peer0.administration.hyper-office.com
-      - CORE_PEER_ADDRESS=peer0.administration.hyper-office.com:7051
+      - CORE_PEER_ID=peer0.administration.hyper-office.tech
+      - CORE_PEER_ADDRESS=peer0.administration.hyper-office.tech:7051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.administration.hyper-office.com:7052
+      - CORE_PEER_CHAINCODEADDRESS=peer0.administration.hyper-office.tech:7052
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.administration.hyper-office.com:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.administration.hyper-office.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.administration.hyper-office.tech:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.administration.hyper-office.tech:7051
       - CORE_PEER_LOCALMSPID=AdministrationMSP
     volumes:
         - /var/run/docker.sock:/host/var/run/docker.sock
-        - ../organizations/peerOrganizations/administration.hyper-office.com/peers/peer0.administration.hyper-office.com/msp:/etc/hyperledger/fabric/msp
-        - ../organizations/peerOrganizations/administration.hyper-office.com/peers/peer0.administration.hyper-office.com/tls:/etc/hyperledger/fabric/tls
-        - peer0.administration.hyper-office.com:/var/hyperledger/production
+        - ../organizations/peerOrganizations/administration.hyper-office.tech/peers/peer0.administration.hyper-office.tech/msp:/etc/hyperledger/fabric/msp
+        - ../organizations/peerOrganizations/administration.hyper-office.tech/peers/peer0.administration.hyper-office.tech/tls:/etc/hyperledger/fabric/tls
+        - peer0.administration.hyper-office.tech:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
     ports:
@@ -81,8 +81,8 @@ services:
     networks:
       - test
 
-  peer0.stakeholders.hyper-office.com:
-    container_name: peer0.stakeholders.hyper-office.com
+  peer0.stakeholders.hyper-office.tech:
+    container_name: peer0.stakeholders.hyper-office.tech
     image: hyperledger/fabric-peer:$IMAGE_TAG
     environment:
       #Generic peer variables
@@ -99,19 +99,19 @@ services:
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
       # Peer specific variabes
-      - CORE_PEER_ID=peer0.stakeholders.hyper-office.com
-      - CORE_PEER_ADDRESS=peer0.stakeholders.hyper-office.com:9051
+      - CORE_PEER_ID=peer0.stakeholders.hyper-office.tech
+      - CORE_PEER_ADDRESS=peer0.stakeholders.hyper-office.tech:9051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.stakeholders.hyper-office.com:9052
+      - CORE_PEER_CHAINCODEADDRESS=peer0.stakeholders.hyper-office.tech:9052
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9052
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.stakeholders.hyper-office.com:9051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.stakeholders.hyper-office.com:9051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.stakeholders.hyper-office.tech:9051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.stakeholders.hyper-office.tech:9051
       - CORE_PEER_LOCALMSPID=StakeholdersMSP
     volumes:
         - /var/run/docker.sock:/host/var/run/docker.sock
-        - ../organizations/peerOrganizations/stakeholders.hyper-office.com/peers/peer0.stakeholders.hyper-office.com/msp:/etc/hyperledger/fabric/msp
-        - ../organizations/peerOrganizations/stakeholders.hyper-office.com/peers/peer0.stakeholders.hyper-office.com/tls:/etc/hyperledger/fabric/tls
-        - peer0.stakeholders.hyper-office.com:/var/hyperledger/production
+        - ../organizations/peerOrganizations/stakeholders.hyper-office.tech/peers/peer0.stakeholders.hyper-office.tech/msp:/etc/hyperledger/fabric/msp
+        - ../organizations/peerOrganizations/stakeholders.hyper-office.tech/peers/peer0.stakeholders.hyper-office.tech/tls:/etc/hyperledger/fabric/tls
+        - peer0.stakeholders.hyper-office.tech:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
     ports:
@@ -136,7 +136,7 @@ services:
         - ../organizations:/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations
         - ../scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
     depends_on:
-      - peer0.administration.hyper-office.com
-      - peer0.stakeholders.hyper-office.com
+      - peer0.administration.hyper-office.tech
+      - peer0.stakeholders.hyper-office.tech
     networks:
       - test

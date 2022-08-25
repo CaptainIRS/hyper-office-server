@@ -21,8 +21,8 @@
 	"channels": {
 		"documentchannel": {
 			"peers": {
-				"peer0.administration.hyper-office.com": {},
-				"peer0.stakeholders.hyper-office.com": {}
+				"peer0.administration.hyper-office.tech": {},
+				"peer0.stakeholders.hyper-office.tech": {}
 			},
 			"connection": {
 				"timeout": {
@@ -39,44 +39,44 @@
 		"Administration": {
 			"mspid": "AdministrationMSP",
 			"adminPrivateKey": {
-				"path": "/tmp/crypto/peerOrganizations/administration.hyper-office.com/users/Admin@administration.hyper-office.com/msp/keystore/priv_sk"
+				"path": "/tmp/crypto/peerOrganizations/administration.hyper-office.tech/users/Admin@administration.hyper-office.tech/msp/keystore/priv_sk"
 			},
-			"peers": ["peer0.administration.hyper-office.com"],
+			"peers": ["peer0.administration.hyper-office.tech"],
 			"signedCert": {
-				"path": "/tmp/crypto/peerOrganizations/administration.hyper-office.com/users/Admin@administration.hyper-office.com/msp/signcerts/cert.pem"
+				"path": "/tmp/crypto/peerOrganizations/administration.hyper-office.tech/users/Admin@administration.hyper-office.tech/msp/signcerts/cert.pem"
 			}
 		},
 		"Stakeholders": {
 			"mspid": "StakeholdersMSP",
 			"adminPrivateKey": {
-				"path": "/tmp/crypto/peerOrganizations/stakeholders.hyper-office.com/users/Admin@stakeholders.hyper-office.com/msp/keystore/priv_sk"
+				"path": "/tmp/crypto/peerOrganizations/stakeholders.hyper-office.tech/users/Admin@stakeholders.hyper-office.tech/msp/keystore/priv_sk"
 			},
-			"peers": ["peer0.stakeholders.hyper-office.com"],
+			"peers": ["peer0.stakeholders.hyper-office.tech"],
 			"signedCert": {
-				"path": "/tmp/crypto/peerOrganizations/stakeholders.hyper-office.com/users/Admin@stakeholders.hyper-office.com/msp/signcerts/cert.pem"
+				"path": "/tmp/crypto/peerOrganizations/stakeholders.hyper-office.tech/users/Admin@stakeholders.hyper-office.tech/msp/signcerts/cert.pem"
 			}
 		}
 	},
 	"peers": {
-		"peer0.administration.hyper-office.com": {
+		"peer0.administration.hyper-office.tech": {
 			"tlsCACerts": {
-				"path": "/tmp/crypto/peerOrganizations/administration.hyper-office.com/peers/peer0.administration.hyper-office.com/tls/ca.crt"
+				"path": "/tmp/crypto/peerOrganizations/administration.hyper-office.tech/peers/peer0.administration.hyper-office.tech/tls/ca.crt"
 			},
-			"url": "grpcs://peer0.administration.hyper-office.com:7051"
+			"url": "grpcs://peer0.administration.hyper-office.tech:7051"
 		},
-		"peer0.stakeholders.hyper-office.com": {
+		"peer0.stakeholders.hyper-office.tech": {
 			"tlsCACerts": {
-				"path": "/tmp/crypto/peerOrganizations/stakeholders.hyper-office.com/peers/peer0.stakeholders.hyper-office.com/tls/ca.crt"
+				"path": "/tmp/crypto/peerOrganizations/stakeholders.hyper-office.tech/peers/peer0.stakeholders.hyper-office.tech/tls/ca.crt"
 			},
-			"url": "grpcs://peer0.stakeholders.hyper-office.com:9051"
+			"url": "grpcs://peer0.stakeholders.hyper-office.tech:9051"
 		}
 	},
 	"orderers": {
-		"orderer.hyper-office.com": {
+		"orderer.hyper-office.tech": {
 		    "tlsCACerts": {
-				"path": "/tmp/crypto/ordererOrganizations/hyper-office.com/orderers/orderer.hyper-office.com/tls/ca.crt"
+				"path": "/tmp/crypto/ordererOrganizations/hyper-office.tech/orderers/orderer.hyper-office.tech/tls/ca.crt"
 			},
-		  "url": "grpcs://orderer.hyper-office.com:7050"
+		  "url": "grpcs://orderer.hyper-office.tech:7050"
 		}
 	}
 }

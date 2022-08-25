@@ -38,8 +38,8 @@ commitChaincodeDefinition() {
   # it using the "-o" option
   set -x
   peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer.${DOMAIN} --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name ${CC_NAME} \
-  --peerAddresses localhost:7051 --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/administration.hyper-office.com/peers/peer0.administration.hyper-office.com/tls/ca.crt \
-    --peerAddresses localhost:9051 --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/stakeholders.hyper-office.com/peers/peer0.stakeholders.hyper-office.com/tls/ca.crt \
+  --peerAddresses localhost:7051 --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/administration.hyper-office.tech/peers/peer0.administration.hyper-office.tech/tls/ca.crt \
+    --peerAddresses localhost:9051 --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/stakeholders.hyper-office.tech/peers/peer0.stakeholders.hyper-office.tech/tls/ca.crt \
      --version ${CC_VERSION} --sequence ${CC_SEQUENCE} ${INIT_REQUIRED} ${CC_END_POLICY} ${CC_COLL_CONFIG} >&log.txt
   res=$?
   { set +x; } 2>/dev/null

@@ -11,14 +11,14 @@ const administrationConnectionProfile = AppUtil.buildCCPAdministration();
 const administrationCA = CAUtil.buildCAClient(
   FabricCAServices,
   administrationConnectionProfile,
-  "ca.administration.hyper-office.com"
+  "ca.administration.hyper-office.tech"
 );
 
 const stakeholdersConnectionProfile = AppUtil.buildCCPStakeholders();
 const stakeholdersCA = CAUtil.buildCAClient(
   FabricCAServices,
   stakeholdersConnectionProfile,
-  "ca.stakeholders.hyper-office.com"
+  "ca.stakeholders.hyper-office.tech"
 );
 
 module.exports.enrollUser = async (email) => {
@@ -63,6 +63,9 @@ const performTransaction = async (user, transactionName, transactionType, ...arg
     identity: user.email,
     wallet,
   };
+  if (process.env.REMOTE === "true") {
+    gatewayOptions.discovery = { enabled: true, asLocalhost: false };
+  }
   const gateway = new fabricNetwork.Gateway();
   if (user.role === "User") {
     await gateway.connect(stakeholdersConnectionProfile, gatewayOptions);

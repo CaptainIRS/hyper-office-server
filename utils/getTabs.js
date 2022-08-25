@@ -1,7 +1,7 @@
 module.exports =  getTabs = (role) => {
     let tabs;
     if (role === 'Administrator') {
-        tabs = ['formBuilder', 'workflow', 'documentsForApproval'];
+        tabs = ['formBuilder', 'fileUpload', 'workflow', 'documentsForApproval', 'queryBuilder'];
     } else if(role === 'Moderator'){
         tabs = ['documentsForApproval'];
     } else {

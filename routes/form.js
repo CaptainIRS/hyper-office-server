@@ -98,7 +98,7 @@ router.post('/save_pdf', async function(req, res) {
             stage: 0,
             isDone: false,
             id: models.uuid(),
-            name: formName.name,
+            name: req.body.name,
         });
         await savedResponse.saveAsync();
         // res.status(200).send({message: 'Successfully saved form and PDF', cid: cid});
@@ -115,7 +115,7 @@ router.get('/response/file/:id/view', async (req, res) => {
     if (!formResponse) {
         res.status(404).json({message: 'Form response not found'});
     }
-    const fileBuffer = uint8ArrayConcat(await all(ipfs.cat(new cid(formResponse.cid))));
+    const fileBuffer = uint8ArrayConcat(await all(ipfs.cat(formResponse.cid)));
     const readStream = new stream.PassThrough();
 
     readStream.end(fileBuffer);

@@ -4,8 +4,9 @@ var models = require('../utils/cassandra');
 var ipfs = require('../utils/ipfs');
 var stream = require('stream')
 var all = require('it-all');
-const { addFile, getFile, approveFile, queryFilesOfOwner, rejectFile, queryFilesOfApprover } = require('../utils/blockchain');
+const { addFile, getFile, approveFile, queryFilesOfOwner, rejectFile, queryFilesOfApprover, getBlockchainUser } = require('../utils/blockchain');
 var uint8ArrayConcat = require('uint8arrays/concat').concat;
+var axios = require('axios');
 
 router.post('/create_form', async function(req, res) {
     const {name, data, workflow, dependsOnForms} = req.body;
@@ -338,20 +339,18 @@ router.patch('/response/:id/approve', async (req, res) => {
     if (!req.user) return res.status(401).send({message: 'Unauthorized'});
     const { email, role } = req.user;
     const approver = { email, role };
-    let newHash;
     try {
-        let document = JSON.parse(await getFile(approver, parseInt(req.params.id)));
-        if (!document) {
-            res.status(404).json({message: 'Document not found'});
-        }
-        newHash = document.hash; // sign pdf
+        blockChainUser = await getBlockchainUser(approver);
     }
     catch (err) {
         console.log(err);
-        res.status(500).send({message: 'Failed to get file'});
+        res.status(500).send({message: 'Failed to get block chain user'});
     }
+    let currentHash, pendingStages;
     try {
         const document = JSON.parse(await getFile(approver, parseInt(req.params.id)));
+        currentHash = document.hash
+        pendingStages = document.pendingStates
         if (!document) {
             return res.status(404).json({message: 'Document not found'});
         }
@@ -367,6 +366,19 @@ router.patch('/response/:id/approve', async (req, res) => {
         return res.status(500).send({message: 'Failed to get file'});
     }
     try {
+        let isFinal = false;
+        if(pendingStages.length === 1) {
+            isFinal = true;
+        }
+        const response = await axios.post(process.env.SIGNER_ENDPOINT, {
+            email: req.user.email,
+            cert: blockChainUser.credentials.certificate,
+            key: blockChainUser.credentials.privateKey,
+            cid: currentHash,
+            final: isFinal
+        });
+        const responseJson = response.data;
+        let newHash = responseJson.cid;
         await approveFile(parseInt(req.params.id), approver, newHash);
         res.json({message: 'Approved'});
     }

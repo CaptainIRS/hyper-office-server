@@ -1,6 +1,8 @@
 FROM python:alpine
 
-COPY requirements.txt /app/requirements.txt
+WORKDIR /app
+
+COPY requirements.txt .
 
 RUN pip install -r requirements.txt
 

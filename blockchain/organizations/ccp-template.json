@@ -30,7 +30,8 @@
             },
             "grpcOptions": {
                 "ssl-target-name-override": "peer0.${SUBDOMAIN}.${DOMAIN}",
-                "hostnameOverride": "peer0.${SUBDOMAIN}.${DOMAIN}"
+                "hostnameOverride": "peer0.${SUBDOMAIN}.${DOMAIN}",
+                "grpc.keepalive_timeout_ms": "600000"
             }
         }
     },

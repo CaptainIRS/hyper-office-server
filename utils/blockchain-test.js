@@ -15,7 +15,8 @@ const approveTestFlow = async () => {
                 { status: "Approval by Administrator", designation: "Administrator" },
                 { status: "Approval by Moderator", designation: "Moderator" },
             ],
-            "hash1"
+            "hash1",
+            "name1",
         )).toString();
     console.log(`${green}File added to blockchain with id: ${fileId}${clear}`);
     
@@ -76,7 +77,8 @@ const rejectTestFlow = async () => {
                 { status: "Approval by Administrator", designation: "Administrator" },
                 { status: "Approval by Moderator", designation: "Moderator" },
             ],
-            "hash1"
+            "hash1",
+            "name1",
         )).toString();
     console.log(`${green}File added to blockchain with id: ${fileId}${clear}`);
 

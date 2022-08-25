@@ -17,3 +17,5 @@ sed -i "s/grpcs:\/\/localhost/grpcs:\/\/peer0\.stakeholders\.$SSH_HOST/g" blockc
 
 sed -i "s/https:\/\/localhost/https:\/\/ca\.administration\.$SSH_HOST/g" blockchain/organizations/peerOrganizations/administration.hyper-office.tech/connection-administration.json
 sed -i "s/grpcs:\/\/localhost/grpcs:\/\/peer0\.administration\.$SSH_HOST/g" blockchain/organizations/peerOrganizations/administration.hyper-office.tech/connection-administration.json
+
+rm -rf *-wallet

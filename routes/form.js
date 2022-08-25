@@ -496,6 +496,45 @@ router.get('/response/doc_status/:id', async (req, res) => {
     }
 })
 
+router.get('/response/landing', async (req, res) => {
+    if(!req.user) return res.status(401).send({message: 'Unauthorized'});
+    const { email, role } = req.user;
+    if(role !== 'User') return res.status(401).send({message: 'Unauthorized'});
+
+    try {
+        const user = { email, role }
+        const userDocuments = JSON.parse(await queryFilesOfOwner(user));
+
+        const approved = [];
+        const pending = [];
+        
+        userDocuments.every((doc) => {
+            if(approved.length === 3 && pending.length === 3) {
+                return false;
+            }
+
+            if(approved.length !== 3) {
+                if(doc.currentStatus === 'Completed') {
+                    approved.push(doc);
+                }
+            }
+
+            if(pending.length !== 3) {
+                if(doc.currentStatus === 'Pending') {
+                    pending.push(doc);
+                }
+            }
+
+            return true;
+        });
+
+        res.json({approved, pending});
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({message: 'Failed to get landing details'});
+    }
+})
+
 router.get('/all', async (req, res) => {
     if (!req.user) return res.status(401).send({message: 'Unauthorized'});
     const { email, role } = req.user;

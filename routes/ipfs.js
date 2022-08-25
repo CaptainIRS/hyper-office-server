@@ -10,7 +10,7 @@ router.get('/:id', async function(req, res) {
     }
     try {
         var externalReq = http.request({
-            hostname: 'localhost',
+            hostname: `${process.env.IPFS_HOST || 'localhost'}`,
             port: '8080',
             path: `/ipfs/${req.params.id}`,
         }, function(externalRes) {

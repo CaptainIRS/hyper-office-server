@@ -1,7 +1,7 @@
 var create = require("ipfs-http-client")
 
 var ipfs = create({
-    host: "localhost",
+    host: `${process.env.IPFS_HOST || 'localhost'}`,
     port: "5001",
     protocol: "http"
 })

@@ -12,7 +12,9 @@ import ipfsApi
 import requests
 import logging
 
-ipfs = ipfsApi.Client('127.0.0.1', 5001)
+ipfs_host = os.environ.get('IPFS_HOST', 'localhost')
+
+ipfs = ipfsApi.Client(ipfs_host, 5001)
 
 app = Flask(__name__)
 
@@ -57,7 +59,7 @@ def final_sign(email):
         )
         with open(f'{email}-out.pdf', 'wb') as outf:
             pdf_signer.sign_pdf(w, 
-            appearance_text_params={'url': 'https://example.com'}
+            appearance_text_params={'url': 'https://hyper-office.tech'}
             ,output=outf)
     
 
@@ -76,7 +78,7 @@ def sign():
         f.write(key)
     os.system(f'openssl pkcs12 -export -in {email}-cert.pem -inkey {email}-key.pem -out {email}-p12.p12 -passout pass:')
     
-    res = requests.get('http://localhost:8080/ipfs/'+cid)
+    res = requests.get(f'http://{ipfs_host}:8080/ipfs/'+cid)
     # write res pdf to disk
     with open(f'{email}-in.pdf', 'wb') as f:
         f.write(res.content)

@@ -27,6 +27,14 @@ services:
       - 5000:5000
     depends_on:
       - cassandra
+  
+  signer:
+    build:
+      context: signer
+      dockerfile: Dockerfile
+    container_name: signer
+    ports:
+      - 12345:12345
 
 volumes:
   cassandra:

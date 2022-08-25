@@ -1,42 +1,52 @@
 const { client } = require('../elastic/connect');
 
-module.exports.index = async (formId, docuemntId, data) => {
+module.exports.index = async (formId, docuemntId, data) => 
     await client.index({
         index: formId,
         id: docuemntId,
         document: data
     });
-}
 
-module.exports.update = async (formId, documentId, data) => {
+
+module.exports.update = async (formId, documentId, data) => 
     await client.update({
         index: formId,
         id: documentId,
         document: data
     });
-}
 
-module.exports.delete = async (formId, documentId) => {
+
+module.exports.delete = async (formId, documentId) => 
     await client.delete({
         index: formId,
         id: documentId
     });
-}
 
-module.exports.testIndex = async () => {
-    await client.index({
-        index: 'test',
-        document: {
-            character: 'Ned Stark',
-            quote: 'Winter is coming.'   
-        }
-    });
-    await client.indices.refresh({index: 'test'});
-    const result = await client.search({
-        index: 'test',
-        query: {
-            match: { quote: 'winter' }
-        }
-    })
-    console.log(result.hits.hits);
-}
+
+// testIndex = async () => {
+//     // await client.delete({
+//     //     index: 'test'
+//     // });
+//     const cleardb = await client.deleteByQuery({
+//         index: 'test',
+//         query: { match_all: {} }
+//     });
+//     await client.index({
+//         index: 'test',
+//         document: {
+//             name: 'John Doe',
+//         }
+//     });
+//     await client.index({
+//         index: 'test',
+//         document: {
+//             name: 'John',
+//         }
+//     });
+//     const result = await client.sql.query({
+//         query: 'SELECT * FROM test WHERE name like \'%John%\''
+//     })
+//     console.log(result);
+// }
+
+// testIndex();

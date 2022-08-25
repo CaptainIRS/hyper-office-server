@@ -7,6 +7,7 @@ var all = require('it-all');
 const { addFile, getFile, approveFile, queryFilesOfOwner, rejectFile, queryFilesOfApprover, getBlockchainUser } = require('../utils/blockchain');
 var uint8ArrayConcat = require('uint8arrays/concat').concat;
 var axios = require('axios');
+const elastic = require('../utils/elastic');
 
 router.post('/create_form', async function(req, res) {
     const {name, data, workflow, dependsOnForms} = req.body;
@@ -287,7 +288,7 @@ router.get('/approval_status/:id', async (req, res) => {
 
 router.post('/save_pdf', async function(req, res) {
     try {
-        const { formId, fileName } = req.body;
+        const { formId, fileName, formData } = req.body;
         const file_buffer = Buffer.from(req.body.base64, 'base64');
         const ipfsFile = await ipfs.add(file_buffer);
         const hash = ipfsFile.cid.toString();
@@ -304,6 +305,11 @@ router.post('/save_pdf', async function(req, res) {
         }
         const states = workflow.state;
         const documentId = (await addFile(owner, states, hash, fileName)).toString();
+        await elastic.index(
+            formId,
+            documentId,
+            JSON.parse(formData),
+        );
         res.redirect(process.env.FRONTEND + '/viewdocs/' + documentId);
     }
     catch (err) {

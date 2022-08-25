@@ -338,7 +338,18 @@ router.patch('/response/:id/approve', async (req, res) => {
     if (!req.user) return res.status(401).send({message: 'Unauthorized'});
     const { email, role } = req.user;
     const approver = { email, role };
-    let newHash = 'newhash'; // sign pdf
+    let newHash;
+    try {
+        let document = JSON.parse(await getFile(approver, parseInt(req.params.id)));
+        if (!document) {
+            res.status(404).json({message: 'Document not found'});
+        }
+        newHash = document.hash; // sign pdf
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send({message: 'Failed to get file'});
+    }
     try {
         const document = JSON.parse(await getFile(approver, parseInt(req.params.id)));
         if (!document) {
@@ -369,7 +380,6 @@ router.patch('/response/:id/reject', async (req, res) => {
     if (!req.user) return res.status(401).send({message: 'Unauthorized'});
     const { email, role } = req.user;
     const rejector = { email, role };
-    let newHash = 'newhash'; // sign pdf
     try {
         const document = JSON.parse(await getFile(rejector, parseInt(req.params.id)));
         if (!document) {

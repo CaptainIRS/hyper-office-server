@@ -24,7 +24,7 @@ router.post('/set', async function(req, res) {
 })
 
 router.get('/list', async function(req, res) {
-    const roles = [ 'Administrator', 'Moderator', 'User' ];
+    const roles = [ 'Administrator', 'Moderator' ];
     res.status(200).json(roles);  
 })
 

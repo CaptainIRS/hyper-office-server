@@ -32,6 +32,8 @@ services:
     build:
       context: signer
       dockerfile: Dockerfile
+    env_file:
+      - .env
     container_name: signer
     ports:
       - 12345:12345

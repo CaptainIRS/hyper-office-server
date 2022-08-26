@@ -1,6 +1,6 @@
 FROM python:alpine
 
-RUN apk add --no-cache gcc g++
+RUN apk add --no-cache gcc g++ openssl
 
 WORKDIR /app
 

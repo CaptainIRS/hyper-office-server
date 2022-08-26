@@ -498,10 +498,9 @@ router.get('/response/toapprove', async (req, res) => {
 router.get('/response/doc_status/:id', async (req, res) => {
     if (!req.user) return res.status(401).send({message: 'Unauthorized'});
     const { email, role } = req.user;
-    if (role !== 'User') return res.status(401).send({message: 'Unauthorized'});
-    const owner = { email, role };
+    const user = { email, role };
     try {
-        const ownerDocuments = JSON.parse(await queryFilesOfOwner(owner));
+        const ownerDocuments = role === 'User' ? JSON.parse(await queryFilesOfOwner(user)) : JSON.parse(await queryFilesOfApprover(user));
         const result = ownerDocuments.find(document => document.id === parseInt(req.params.id));
         // console.log(result);
         res.json(result);

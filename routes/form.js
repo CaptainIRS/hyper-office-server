@@ -305,10 +305,20 @@ router.post('/save_pdf', async function(req, res) {
         }
         const states = workflow.state;
         const documentId = (await addFile(owner, states, hash, fileName)).toString();
+        console.log('Form Data',  JSON.parse(formData.replace(/-/g, '_')));
+        let parsed = JSON.parse(formData.replace(/-/g, '_'));
+        
+        for (let key in parsed) {
+            if (parsed.hasOwnProperty(key)) {
+                parsed['id_'+key.replace(/-/g, '_')] = parsed[key];
+                delete parsed[key];
+            }
+        }
+  
         await elastic.index(
-            formId,
+            'id_'+formId.replace(/-/g, '_'),
             documentId,
-            JSON.parse(formData),
+            parsed
         );
         res.redirect(process.env.FRONTEND + '/viewdocs/' + documentId);
     }
